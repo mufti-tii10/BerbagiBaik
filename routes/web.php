@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ItemController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -33,4 +34,9 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/admin/dashboard', fn () => view('dashboard.admin'))
         ->middleware(RoleMiddleware::class . ':admin')->name('admin.dashboard');
+
+    // Tahap 4: barang donasi (khusus donatur)
+    Route::middleware(RoleMiddleware::class . ':donor')->prefix('donor')->group(function () {
+        Route::resource('items', ItemController::class)->except('show')->names('donor.items');
+    });
 });
