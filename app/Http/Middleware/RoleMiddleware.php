@@ -16,6 +16,14 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
+        if ($user->is_blocked) {
+            auth()->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')->withErrors(['email' => 'Akun Anda diblokir. Hubungi admin.']);
+        }
+
         if (! in_array($user->role, $roles, true)) {
             abort(403, 'Anda tidak punya akses ke halaman ini.');
         }

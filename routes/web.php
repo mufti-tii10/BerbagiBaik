@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ItemController;
 use App\Http\Middleware\RoleMiddleware;
@@ -26,17 +27,29 @@ Route::middleware('auth')->group(function () {
         };
     })->name('dashboard');
 
-    Route::get('/donor/dashboard', fn () => view('dashboard.donor'))
-        ->middleware(RoleMiddleware::class . ':donor')->name('donor.dashboard');
-
     Route::get('/receiver/dashboard', fn () => view('dashboard.receiver'))
         ->middleware(RoleMiddleware::class . ':receiver')->name('receiver.dashboard');
 
-    Route::get('/admin/dashboard', fn () => view('dashboard.admin'))
-        ->middleware(RoleMiddleware::class . ':admin')->name('admin.dashboard');
-
-    // Tahap 4: barang donasi (khusus donatur)
+    // Donatur
     Route::middleware(RoleMiddleware::class . ':donor')->prefix('donor')->group(function () {
+        Route::get('/dashboard', fn () => view('dashboard.donor'))->name('donor.dashboard');
         Route::resource('items', ItemController::class)->except('show')->names('donor.items');
+    });
+
+    // Admin
+    Route::middleware(RoleMiddleware::class . ':admin')->prefix('admin')->name('admin.')->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'dashboard'])->name('dashboard');
+
+        Route::get('/items', [AdminController::class, 'items'])->name('items.index');
+        Route::post('/items/{item}/approve', [AdminController::class, 'approveItem'])->name('items.approve');
+        Route::post('/items/{item}/reject', [AdminController::class, 'rejectItem'])->name('items.reject');
+
+        Route::get('/users', [AdminController::class, 'users'])->name('users.index');
+        Route::post('/users/{user}/block', [AdminController::class, 'blockUser'])->name('users.block');
+        Route::post('/users/{user}/unblock', [AdminController::class, 'unblockUser'])->name('users.unblock');
+
+        Route::get('/reports', [AdminController::class, 'reports'])->name('reports.index');
+        Route::post('/reports/{report}/handle', [AdminController::class, 'handleReport'])->name('reports.handle');
+        Route::post('/reports/{report}/takedown', [AdminController::class, 'takedownReport'])->name('reports.takedown');
     });
 });

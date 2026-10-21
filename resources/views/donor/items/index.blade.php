@@ -24,6 +24,9 @@
             <h3>{{ $item->name }}</h3>
             <p class="meta">{{ $item->category->name }} &middot; {{ $item->condition }} &middot; {{ $item->location }}</p>
             <span class="status status-{{ $item->status }}">{{ $statusLabel[$item->status] ?? $item->status }}</span>
+            @if ($item->status === 'rejected' && $item->admin_note)
+                <p class="note-box">Catatan admin: {{ $item->admin_note }}<br><small>Perbaiki barang lewat tombol Edit untuk diverifikasi ulang.</small></p>
+            @endif
         </div>
         <div class="item-actions">
             @if ($item->status !== 'completed')

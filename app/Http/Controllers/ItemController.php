@@ -69,6 +69,7 @@ class ItemController extends Controller
 
         // Setelah diubah, barang diverifikasi ulang oleh admin
         $data['status'] = 'pending';
+        $data['admin_note'] = null;
 
         $item->update($data);
 
