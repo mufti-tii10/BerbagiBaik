@@ -29,4 +29,11 @@ class Item extends Model
     {
         return $this->hasMany(Report::class);
     }
+
+    // Barang yang sudah dipublikasikan dan belum dalam proses serah terima
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'published')
+            ->whereDoesntHave('requests', fn ($q) => $q->where('status', 'awaiting_handover'));
+    }
 }

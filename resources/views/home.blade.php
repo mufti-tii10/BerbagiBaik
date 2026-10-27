@@ -6,9 +6,11 @@
     <div class="actions">
         @guest
             <a class="btn btn-accent" href="{{ route('register') }}">Mulai Berbagi</a>
+            <a class="btn btn-outline" href="{{ route('catalog.index') }}">Cari Barang</a>
             <a class="btn btn-outline" href="{{ route('login') }}">Masuk</a>
         @else
             <a class="btn btn-accent" href="{{ route('dashboard') }}">Ke Dashboard</a>
+            <a class="btn btn-outline" href="{{ route('catalog.index') }}">Cari Barang</a>
         @endguest
     </div>
 </section>

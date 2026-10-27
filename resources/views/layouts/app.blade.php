@@ -10,6 +10,7 @@
     <header class="navbar">
         <div class="navbar-inner">
             <a class="brand" href="{{ route('home') }}">Berbagi<span>Baik</span></a>
+            <a class="nav-link" href="{{ route('catalog.index') }}">Cari Barang</a>
             @auth
                 @php $unread = auth()->user()->appNotifications()->where('is_read', false)->count(); @endphp
                 <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>

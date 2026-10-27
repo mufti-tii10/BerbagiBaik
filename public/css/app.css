@@ -237,3 +237,31 @@ input:focus, select:focus, textarea:focus {
 
 .link-btn { background: none; border: 0; color: var(--muted); text-decoration: underline; cursor: pointer; font-size: .88rem; padding: 4px; }
 .link-btn:hover { color: var(--danger); }
+
+/* Tahap 6: katalog barang */
+.filters { display: grid; gap: 12px 14px; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); align-items: end; padding: 18px; margin-bottom: 14px; }
+.filters .field { margin: 0; }
+.filters .btn-row { align-self: end; }
+.filters .btn { margin: 0; padding: 10px 20px; }
+
+.catalog-grid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
+.item-card { padding: 0; overflow: hidden; text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform .12s, box-shadow .12s; }
+.item-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(31,41,55,.12); }
+.item-card img { width: 100%; height: 180px; object-fit: cover; background: #e5e7eb; display: block; }
+.item-card .body { padding: 14px 16px 16px; }
+.item-card h3 { margin: 8px 0 4px; font-size: 1.05rem; }
+.item-card .meta { margin: 0 0 4px; }
+
+.pager { display: flex; justify-content: center; align-items: center; gap: 18px; margin-top: 26px; flex-wrap: wrap; }
+.pager a { text-decoration: none; font-weight: 600; padding: 8px 16px; border: 1px solid var(--primary); border-radius: 10px; }
+.pager a:hover { background: var(--primary-soft); }
+.pager .disabled { color: #9ca3af; padding: 8px 16px; }
+
+.detail { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 24px; align-items: start; }
+.detail > div > img { width: 100%; max-height: 480px; object-fit: cover; border-radius: 12px; background: #e5e7eb; display: block; }
+.spec { display: grid; grid-template-columns: 110px 1fr; gap: 6px 12px; margin: 14px 0; }
+.spec dt { color: var(--muted); }
+.spec dd { margin: 0; font-weight: 600; }
+.action-box { margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 10px; border: 1px solid #eef0f4; }
+.action-box p { margin-top: 0; }
+@media (max-width: 760px) { .detail { grid-template-columns: 1fr; } }

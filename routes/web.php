@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DonorController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\NotificationController;
@@ -10,6 +11,10 @@ use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => view('home'))->name('home');
+
+// Katalog barang (terbuka untuk tamu)
+Route::get('/barang', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/barang/{item}', [CatalogController::class, 'show'])->name('catalog.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
