@@ -2,7 +2,10 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\DonorController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -27,13 +30,24 @@ Route::middleware('auth')->group(function () {
         };
     })->name('dashboard');
 
+    // Semua peran
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+
     Route::get('/receiver/dashboard', fn () => view('dashboard.receiver'))
         ->middleware(RoleMiddleware::class . ':receiver')->name('receiver.dashboard');
 
     // Donatur
     Route::middleware(RoleMiddleware::class . ':donor')->prefix('donor')->group(function () {
-        Route::get('/dashboard', fn () => view('dashboard.donor'))->name('donor.dashboard');
+        Route::get('/dashboard', [DonorController::class, 'dashboard'])->name('donor.dashboard');
         Route::resource('items', ItemController::class)->except('show')->names('donor.items');
+
+        Route::get('/requests', [DonorController::class, 'requests'])->name('donor.requests.index');
+        Route::post('/requests/{donationRequest}/approve', [DonorController::class, 'approve'])->name('donor.requests.approve');
+        Route::post('/requests/{donationRequest}/reject', [DonorController::class, 'reject'])->name('donor.requests.reject');
+
+        Route::get('/history', [DonorController::class, 'history'])->name('donor.history');
     });
 
     // Admin

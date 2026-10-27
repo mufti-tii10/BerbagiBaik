@@ -37,6 +37,9 @@
         <div class="item-info">
             <h3>{{ $item->name }}</h3>
             <p class="meta">{{ $item->category->name }} &middot; {{ $item->condition }} &middot; {{ $item->location }}</p>
+            @if ($item->latitude && $item->longitude)
+                <p class="meta"><a href="https://www.google.com/maps?q={{ $item->latitude }},{{ $item->longitude }}" target="_blank" rel="noopener">&#128205; Lihat di Google Maps</a></p>
+            @endif
             <p class="meta">Donatur: {{ $item->donor->name }} &middot; WA {{ $item->donor->phone_wa }}</p>
             @if ($item->description)
                 <p class="desc">{{ \Illuminate\Support\Str::limit($item->description, 160) }}</p>

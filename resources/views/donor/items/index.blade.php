@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Barang Saya - BerbagiBaik')
 @section('content')
+@include('donor._nav', ['active' => 'items'])
 @php
     $statusLabel = ['pending' => 'Menunggu verifikasi', 'published' => 'Dipublikasikan', 'rejected' => 'Ditolak', 'completed' => 'Selesai'];
 @endphp
@@ -23,13 +24,16 @@
         <div class="item-info">
             <h3>{{ $item->name }}</h3>
             <p class="meta">{{ $item->category->name }} &middot; {{ $item->condition }} &middot; {{ $item->location }}</p>
+            @if ($item->latitude && $item->longitude)
+                <p class="meta"><a href="https://www.google.com/maps?q={{ $item->latitude }},{{ $item->longitude }}" target="_blank" rel="noopener">&#128205; Lihat di Google Maps</a></p>
+            @endif
             <span class="status status-{{ $item->status }}">{{ $statusLabel[$item->status] ?? $item->status }}</span>
             @if ($item->status === 'rejected' && $item->admin_note)
                 <p class="note-box">Catatan admin: {{ $item->admin_note }}<br><small>Perbaiki barang lewat tombol Edit untuk diverifikasi ulang.</small></p>
             @endif
         </div>
         <div class="item-actions">
-            @if ($item->status !== 'completed')
+            @if ($item->status !== 'completed' && ! $item->active_requests_count)
                 <a class="btn btn-outline btn-small-dark" href="{{ route('donor.items.edit', $item) }}">Edit</a>
                 <form method="POST" action="{{ route('donor.items.destroy', $item) }}" onsubmit="return confirm('Hapus barang ini?')">
                     @csrf

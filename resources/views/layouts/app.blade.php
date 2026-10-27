@@ -11,10 +11,18 @@
         <div class="navbar-inner">
             <a class="brand" href="{{ route('home') }}">Berbagi<span>Baik</span></a>
             @auth
+                @php $unread = auth()->user()->appNotifications()->where('is_read', false)->count(); @endphp
                 <a class="nav-link" href="{{ route('dashboard') }}">Dashboard</a>
+                <a class="nav-link" href="{{ route('notifications.index') }}">
+                    Notifikasi @if ($unread > 0)<span class="dot">{{ $unread }}</span>@endif
+                </a>
+                <a class="nav-link" href="{{ route('profile.edit') }}">Profil</a>
                 <div class="nav-user">
                     <span>{{ auth()->user()->name }}</span>
                     <span class="badge">{{ ['donor' => 'Donatur', 'receiver' => 'Penerima', 'admin' => 'Admin'][auth()->user()->role] ?? auth()->user()->role }}</span>
+                    @if (auth()->user()->isTrustedDonor())
+                        <span class="badge badge-star">&#9733; Terpercaya</span>
+                    @endif
                 </div>
                 <form method="POST" action="{{ route('logout') }}">
                     @csrf

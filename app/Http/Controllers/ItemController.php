@@ -14,7 +14,7 @@ class ItemController extends Controller
 
     public function index(Request $request)
     {
-        $items = $request->user()->items()->with('category')->latest()->get();
+        $items = $request->user()->items()->with('category')->withCount(['requests as active_requests_count' => fn ($q) => $q->where('status', 'awaiting_handover')])->latest()->get();
 
         return view('donor.items.index', compact('items'));
     }
@@ -94,6 +94,7 @@ class ItemController extends Controller
         // Hanya pemilik yang boleh mengubah, dan barang yang sudah selesai dikunci
         abort_unless($item->donor_id === $request->user()->id, 403);
         abort_if($item->status === 'completed', 403, 'Barang yang sudah selesai tidak dapat diubah.');
+        abort_if($item->requests()->where('status', 'awaiting_handover')->exists(), 403, 'Barang sedang menunggu serah terima dan tidak dapat diubah.');
     }
 
     private function validated(Request $request, bool $photoRequired): array
@@ -103,6 +104,8 @@ class ItemController extends Controller
             'category_id' => ['required', 'exists:categories,id'],
             'condition' => ['required', Rule::in(self::CONDITIONS)],
             'location' => ['required', 'string', 'max:150'],
+            'latitude' => ['nullable', 'numeric', 'between:-90,90'],
+            'longitude' => ['nullable', 'numeric', 'between:-180,180'],
             'description' => ['nullable', 'string', 'max:1000'],
             'photo' => [$photoRequired ? 'required' : 'nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ], [

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['donor_id', 'category_id', 'name', 'description', 'condition', 'location', 'photo_url', 'status', 'admin_note'])]
+#[Fillable(['donor_id', 'category_id', 'name', 'description', 'condition', 'location', 'photo_url', 'status', 'admin_note', 'latitude', 'longitude'])]
 class Item extends Model
 {
     public function donor(): BelongsTo

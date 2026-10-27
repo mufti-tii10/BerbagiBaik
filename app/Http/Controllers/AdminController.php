@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AppNotification;
 use App\Models\Item;
 use App\Models\Report;
 use App\Models\User;
@@ -47,6 +48,7 @@ class AdminController extends Controller
         abort_if($item->status === 'completed', 403, 'Barang yang sudah selesai tidak dapat diubah.');
 
         $item->update(['status' => 'published', 'admin_note' => null]);
+        AppNotification::create(['user_id' => $item->donor_id, 'message' => 'Barang "' . $item->name . '" disetujui dan sudah dipublikasikan.']);
 
         return back()->with('success', 'Barang "' . $item->name . '" dipublikasikan.');
     }
@@ -63,6 +65,7 @@ class AdminController extends Controller
         ]);
 
         $item->update(['status' => 'rejected', 'admin_note' => $data['admin_note']]);
+        AppNotification::create(['user_id' => $item->donor_id, 'message' => 'Barang "' . $item->name . '" ditolak admin. Alasan: ' . $data['admin_note']]);
 
         return back()->with('success', 'Barang "' . $item->name . '" ditolak.');
     }
@@ -148,6 +151,7 @@ class AdminController extends Controller
             'admin_note' => 'Diturunkan admin berdasarkan laporan: ' . Str::limit($report->reason, 300),
         ]);
         $report->update(['status' => 'handled']);
+        AppNotification::create(['user_id' => $item->donor_id, 'message' => 'Barang "' . $item->name . '" diturunkan admin berdasarkan laporan pengguna.']);
 
         return back()->with('success', 'Barang diturunkan dan laporan ditandai selesai.');
     }

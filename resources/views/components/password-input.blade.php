@@ -1,4 +1,4 @@
-@props(['name', 'id' => null, 'label' => null, 'autocomplete' => 'current-password'])
+@props(['name', 'id' => null, 'label' => null, 'autocomplete' => 'current-password', 'required' => true])
 @php $id = $id ?? $name; @endphp
 
 <div class="field">
@@ -6,7 +6,7 @@
         <label for="{{ $id }}">{{ $label }}</label>
     @endif
     <div class="password-wrap">
-        <input id="{{ $id }}" type="password" name="{{ $name }}" autocomplete="{{ $autocomplete }}" required>
+        <input id="{{ $id }}" type="password" name="{{ $name }}" autocomplete="{{ $autocomplete }}" {{ $required ? 'required' : '' }}>
         <button type="button" class="toggle-password" data-target="{{ $id }}" aria-label="Tampilkan sandi" aria-pressed="false">
             <svg class="icon-eye" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
