@@ -7,6 +7,7 @@ use App\Http\Controllers\DonorController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ReceiverController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -40,8 +41,15 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
 
-    Route::get('/receiver/dashboard', fn () => view('dashboard.receiver'))
-        ->middleware(RoleMiddleware::class . ':receiver')->name('receiver.dashboard');
+    // Penerima
+    Route::post('/barang/{item}/ajukan', [ReceiverController::class, 'store'])
+        ->middleware(RoleMiddleware::class . ':receiver')->name('receiver.requests.store');
+
+    Route::middleware(RoleMiddleware::class . ':receiver')->prefix('receiver')->group(function () {
+        Route::get('/dashboard', [ReceiverController::class, 'dashboard'])->name('receiver.dashboard');
+        Route::get('/requests', [ReceiverController::class, 'requests'])->name('receiver.requests.index');
+        Route::post('/requests/{donationRequest}/cancel', [ReceiverController::class, 'cancel'])->name('receiver.requests.cancel');
+    });
 
     // Donatur
     Route::middleware(RoleMiddleware::class . ':donor')->prefix('donor')->group(function () {
@@ -62,6 +70,8 @@ Route::middleware('auth')->group(function () {
         Route::get('/items', [AdminController::class, 'items'])->name('items.index');
         Route::post('/items/{item}/approve', [AdminController::class, 'approveItem'])->name('items.approve');
         Route::post('/items/{item}/reject', [AdminController::class, 'rejectItem'])->name('items.reject');
+
+        Route::get('/requests', [AdminController::class, 'requests'])->name('requests.index');
 
         Route::get('/users', [AdminController::class, 'users'])->name('users.index');
         Route::post('/users/{user}/block', [AdminController::class, 'blockUser'])->name('users.block');

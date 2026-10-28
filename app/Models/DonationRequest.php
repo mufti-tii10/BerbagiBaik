@@ -12,6 +12,15 @@ class DonationRequest extends Model
 {
     protected $table = 'requests';
 
+    // Pengajuan yang masih berjalan dihitung terhadap batas per penerima
+    public const MAX_ACTIVE = 3;
+    public const ACTIVE_STATUSES = ['pending', 'awaiting_handover'];
+
+    public function scopeActive($query)
+    {
+        return $query->whereIn('status', self::ACTIVE_STATUSES);
+    }
+
     protected function casts(): array
     {
         return [

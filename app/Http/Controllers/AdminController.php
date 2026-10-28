@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppNotification;
+use App\Models\DonationRequest;
 use App\Models\Item;
 use App\Models\Report;
 use App\Models\User;
@@ -20,6 +21,7 @@ class AdminController extends Controller
             'donors' => User::where('role', 'donor')->count(),
             'receivers' => User::where('role', 'receiver')->count(),
             'openReports' => Report::where('status', 'open')->count(),
+            'activeRequests' => DonationRequest::active()->count(),
         ]);
     }
 
@@ -154,5 +156,43 @@ class AdminController extends Controller
         AppNotification::create(['user_id' => $item->donor_id, 'message' => 'Barang "' . $item->name . '" diturunkan admin berdasarkan laporan pengguna.']);
 
         return back()->with('success', 'Barang diturunkan dan laporan ditandai selesai.');
+    }
+
+    // ---------- Pantau pengajuan (hanya melihat) ----------
+
+    public function requests(Request $request)
+    {
+        $groups = [
+            'pending' => ['pending'],
+            'awaiting_handover' => ['awaiting_handover'],
+            'done' => ['received', 'completed'],
+            'closed' => ['rejected', 'cancelled', 'expired'],
+        ];
+
+        $tab = $request->query('tab', 'all');
+        if ($tab !== 'all' && ! isset($groups[$tab])) {
+            $tab = 'all';
+        }
+        $q = trim((string) $request->query('q', ''));
+
+        $requests = DonationRequest::with(['item.category', 'item.donor', 'receiver'])
+            ->when($tab !== 'all', fn ($query) => $query->whereIn('status', $groups[$tab]))
+            ->when($q !== '', function ($query) use ($q) {
+                $like = '%' . addcslashes($q, '%_\\') . '%';
+                $query->where(function ($w) use ($like) {
+                    $w->whereHas('item', fn ($i) => $i->where('name', 'like', $like)
+                            ->orWhereHas('donor', fn ($d) => $d->where('name', 'like', $like)))
+                        ->orWhereHas('receiver', fn ($r) => $r->where('name', 'like', $like));
+                });
+            })
+            ->latest()
+            ->limit(200)
+            ->get();
+
+        $all = DonationRequest::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+        $counts = collect($groups)->map(fn ($statuses) => collect($statuses)->sum(fn ($st) => $all[$st] ?? 0));
+        $counts['all'] = $all->sum();
+
+        return view('admin.requests', compact('requests', 'tab', 'q', 'counts'));
     }
 }

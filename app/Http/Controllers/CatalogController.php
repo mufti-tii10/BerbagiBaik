@@ -64,7 +64,14 @@ class CatalogController extends Controller
         $item->load(['category', 'donor']);
         $reserved = $item->requests()->where('status', 'awaiting_handover')->exists();
 
-        return view('catalog.show', compact('item', 'reserved', 'canPreview'));
+        $myRequest = null;
+        $activeCount = 0;
+        if ($user && $user->isReceiver()) {
+            $myRequest = $item->requests()->where('receiver_id', $user->id)->active()->first();
+            $activeCount = $user->donationRequests()->active()->count();
+        }
+
+        return view('catalog.show', compact('item', 'reserved', 'canPreview', 'myRequest', 'activeCount'));
     }
 
     // Cegah karakter % dan _ dari pengguna bekerja sebagai wildcard

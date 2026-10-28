@@ -265,3 +265,7 @@ input:focus, select:focus, textarea:focus {
 .action-box { margin-top: 20px; padding: 16px; background: #f8fafc; border-radius: 10px; border: 1px solid #eef0f4; }
 .action-box p { margin-top: 0; }
 @media (max-width: 760px) { .detail { grid-template-columns: 1fr; } }
+
+/* Tahap 7: pengajuan */
+.status-cancelled { background: #e5e7eb; color: #374151; }
+.action-box textarea { margin-bottom: 4px; }

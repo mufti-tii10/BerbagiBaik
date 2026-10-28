@@ -3,9 +3,19 @@
 @section('content')
 @php
     $statusLabel = ['pending' => 'Menunggu verifikasi', 'published' => 'Dipublikasikan', 'rejected' => 'Ditolak', 'completed' => 'Selesai'];
+    $reqLabel = ['pending' => 'Menunggu keputusan donatur', 'awaiting_handover' => 'Disetujui, menunggu serah terima'];
+    $max = \App\Models\DonationRequest::MAX_ACTIVE;
+    $isReceiver = auth()->check() && auth()->user()->isReceiver();
 @endphp
 
 <p><a href="{{ route('catalog.index') }}">&larr; Kembali ke daftar barang</a></p>
+
+@if (session('success'))
+    <div class="alert alert-success">{{ session('success') }}</div>
+@endif
+@if (session('error'))
+    <div class="alert alert-error">{{ session('error') }}</div>
+@endif
 
 @if ($item->status !== 'published')
     <div class="alert alert-error">
@@ -39,7 +49,11 @@
         @endif
 
         <div class="action-box">
-            @if ($reserved)
+            @if ($isReceiver && $myRequest)
+                <p><strong>Anda sudah mengajukan barang ini.</strong></p>
+                <p class="meta">Status: {{ $reqLabel[$myRequest->status] ?? $myRequest->status }}</p>
+                <a class="btn btn-outline" href="{{ route('receiver.requests.index') }}">Lihat Pengajuan Saya</a>
+            @elseif ($reserved)
                 <p><strong>Barang ini sedang dalam proses serah terima.</strong> Silakan lihat barang lainnya.</p>
             @elseif ($item->status !== 'published')
                 <p class="subtitle" style="margin:0">Barang belum dapat diajukan.</p>
@@ -49,10 +63,24 @@
                     <a class="btn" href="{{ route('login') }}">Masuk</a>
                     <a class="btn btn-outline" href="{{ route('register') }}">Daftar</a>
                 </div>
-            @elseif (auth()->user()->isReceiver())
-                <button class="btn" type="button" disabled>Ajukan Permintaan</button>
-                <span class="tag">segera</span>
-                <p class="hint">Fitur pengajuan permintaan sedang disiapkan.</p>
+            @elseif ($isReceiver)
+                @if ($activeCount >= $max)
+                    <p><strong>Batas {{ $max }} pengajuan aktif tercapai.</strong></p>
+                    <p class="meta">Batalkan atau selesaikan pengajuan lain untuk mengajukan barang ini.</p>
+                    <a class="btn btn-outline" href="{{ route('receiver.requests.index') }}">Lihat Pengajuan Saya</a>
+                @else
+                    <form method="POST" action="{{ route('receiver.requests.store', $item) }}">
+                        @csrf
+                        <div class="field" style="margin-top:0">
+                            <label for="reason">Alasan permintaan</label>
+                            <textarea id="reason" name="reason" rows="4" required
+                                placeholder="Ceritakan singkat mengapa Anda membutuhkan barang ini">{{ old('reason') }}</textarea>
+                            @error('reason') <div class="error">{{ $message }}</div> @enderror
+                        </div>
+                        <button class="btn btn-block" type="submit">Ajukan Permintaan</button>
+                        <p class="hint">Pengajuan aktif Anda: {{ $activeCount }} dari {{ $max }}.</p>
+                    </form>
+                @endif
             @else
                 <p class="subtitle" style="margin:0">Hanya akun penerima yang dapat mengajukan permintaan.</p>
             @endif

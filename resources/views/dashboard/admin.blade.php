@@ -29,5 +29,9 @@
         <span class="stat-num">{{ $openReports }}</span>
         <span>Laporan belum ditangani</span>
     </a>
+    <a class="card stat" href="{{ route('admin.requests.index', ['tab' => 'awaiting_handover']) }}">
+        <span class="stat-num">{{ $activeRequests }}</span>
+        <span>Pengajuan berjalan</span>
+    </a>
 </div>
 @endsection

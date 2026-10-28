@@ -4,8 +4,8 @@
 @include('donor._nav', ['active' => 'requests'])
 @php
     $tabs = ['pending' => 'Menunggu keputusan', 'awaiting_handover' => 'Menunggu serah terima', 'rejected' => 'Ditolak', 'all' => 'Semua'];
-    $label = ['pending' => 'Menunggu keputusan', 'awaiting_handover' => 'Menunggu serah terima', 'received' => 'Diterima', 'completed' => 'Selesai', 'rejected' => 'Ditolak', 'expired' => 'Kedaluwarsa'];
-    $css = ['pending' => 'status-pending', 'awaiting_handover' => 'status-completed', 'received' => 'status-published', 'completed' => 'status-published', 'rejected' => 'status-rejected', 'expired' => 'status-rejected'];
+    $label = ['pending' => 'Menunggu keputusan', 'awaiting_handover' => 'Menunggu serah terima', 'received' => 'Diterima', 'completed' => 'Selesai', 'rejected' => 'Ditolak', 'cancelled' => 'Dibatalkan penerima', 'expired' => 'Kedaluwarsa'];
+    $css = ['pending' => 'status-pending', 'awaiting_handover' => 'status-completed', 'received' => 'status-published', 'completed' => 'status-published', 'rejected' => 'status-rejected', 'cancelled' => 'status-cancelled', 'expired' => 'status-rejected'];
 @endphp
 
 <div class="page-head">
