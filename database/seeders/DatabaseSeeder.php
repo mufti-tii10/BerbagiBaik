@@ -11,6 +11,11 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(CategorySeeder::class);
 
+        // Data contoh hanya dibuat di laptop pengembang, bukan di server sungguhan
+        if (app()->environment('local')) {
+            $this->call(DemoSeeder::class);
+        }
+
         User::firstOrCreate(
             ['email' => 'admin@berbagibaik.test'],
             [
