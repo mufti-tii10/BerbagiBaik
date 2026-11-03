@@ -35,7 +35,7 @@ Kebutuhan: PHP 8.4, Composer, Git, MySQL atau MariaDB.
 
 | Peran | Email | Sandi |
 |---|---|---|
-| Admin | admin@berbagibaik.test | lihat database/seeders/DatabaseSeeder.php |
+| Admin | admin@berbagibaik.test | ADMIN_PASSWORD di .env (bawaan: admin12345) |
 | Donatur | donatur@berbagibaik.test | demo12345 |
 | Donatur kedua | donatur2@berbagibaik.test | demo12345 |
 | Penerima | penerima@berbagibaik.test | demo12345 |

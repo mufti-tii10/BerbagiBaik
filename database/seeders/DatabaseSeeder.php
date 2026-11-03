@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             ['email' => 'admin@berbagibaik.test'],
             [
                 'name' => 'Admin BerbagiBaik',
-                'password' => 'admin12345',
+                'password' => env('ADMIN_PASSWORD') ?: 'admin12345',
                 'role' => 'admin',
                 'phone_wa' => null,
             ]

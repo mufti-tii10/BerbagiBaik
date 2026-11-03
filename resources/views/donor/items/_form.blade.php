@@ -1,4 +1,7 @@
 @csrf
+<div class="info-box" style="margin-top:0">
+    Platform ini hanya untuk <strong>barang layak pakai</strong>. Uang, dana, atau pinjaman tidak diterima dan akan ditolak admin.
+</div>
 @php
     $lat = old('latitude', $item?->latitude);
     $lng = old('longitude', $item?->longitude);
