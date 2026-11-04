@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AppNotification;
+use App\Models\FundRequest;
 use App\Models\DonationRequest;
 use App\Models\Item;
 use App\Models\Report;
@@ -22,6 +23,7 @@ class AdminController extends Controller
             'receivers' => User::where('role', 'receiver')->count(),
             'openReports' => Report::where('status', 'open')->count(),
             'activeRequests' => DonationRequest::active()->count(),
+            'pendingFunds' => FundRequest::where('status', 'pending')->count(),
         ]);
     }
 
@@ -194,5 +196,61 @@ class AdminController extends Controller
         $counts['all'] = $all->sum();
 
         return view('admin.requests', compact('requests', 'tab', 'q', 'counts'));
+    }
+
+    // ---------- Verifikasi kebutuhan dana ----------
+
+    public function funds(Request $request)
+    {
+        $status = $request->query('status', 'pending');
+        if (! in_array($status, ['pending', 'published', 'rejected', 'closed', 'all'], true)) {
+            $status = 'pending';
+        }
+
+        $funds = FundRequest::with('receiver')
+            ->withSum(['donations as collected_sum' => fn ($d) => $d->where('status', 'confirmed')], 'amount')
+            ->when($status !== 'all', fn ($q) => $q->where('status', $status))
+            ->latest()
+            ->limit(100)
+            ->get();
+
+        $counts = FundRequest::selectRaw('status, count(*) as total')->groupBy('status')->pluck('total', 'status');
+
+        return view('admin.funds', compact('funds', 'status', 'counts'));
+    }
+
+    public function approveFund(FundRequest $fund)
+    {
+        abort_unless($fund->status === 'pending', 403, 'Hanya kebutuhan yang menunggu verifikasi yang dapat disetujui.');
+
+        $fund->update(['status' => 'published', 'admin_note' => null]);
+
+        AppNotification::create([
+            'user_id' => $fund->receiver_id,
+            'message' => 'Kebutuhan dana "' . $fund->title . '" disetujui dan sudah tayang di Donasi Dana.',
+        ]);
+
+        return back()->with('success', 'Kebutuhan dana "' . $fund->title . '" dipublikasikan.');
+    }
+
+    public function rejectFund(Request $request, FundRequest $fund)
+    {
+        abort_unless(in_array($fund->status, ['pending', 'published'], true), 403, 'Kebutuhan ini tidak dapat ditolak.');
+
+        $data = $request->validate([
+            'admin_note' => ['required', 'string', 'max:500'],
+        ], [
+            'admin_note.required' => 'Alasan penolakan wajib diisi.',
+            'admin_note.max' => 'Alasan penolakan maksimal 500 karakter.',
+        ]);
+
+        $fund->update(['status' => 'rejected', 'admin_note' => $data['admin_note']]);
+
+        AppNotification::create([
+            'user_id' => $fund->receiver_id,
+            'message' => 'Kebutuhan dana "' . $fund->title . '" ditolak admin. Alasan: ' . $data['admin_note'],
+        ]);
+
+        return back()->with('success', 'Kebutuhan dana "' . $fund->title . '" ditolak.');
     }
 }

@@ -33,5 +33,9 @@
         <span class="stat-num">{{ $activeRequests }}</span>
         <span>Pengajuan berjalan</span>
     </a>
+    <a class="card stat" href="{{ route('admin.funds.index', ['status' => 'pending']) }}">
+        <span class="stat-num">{{ $pendingFunds }}</span>
+        <span>Kebutuhan dana menunggu verifikasi</span>
+    </a>
 </div>
 @endsection

@@ -269,3 +269,12 @@ input:focus, select:focus, textarea:focus {
 /* Tahap 7: pengajuan */
 .status-cancelled { background: #e5e7eb; color: #374151; }
 .action-box textarea { margin-bottom: 4px; }
+
+/* Modul donasi dana */
+.ph { display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #e8effa, #dbe5f6); color: var(--primary); font-weight: 700; }
+.item-card .ph { height: 180px; }
+.ph-big { height: 320px; border-radius: 12px; font-size: 1.4rem; }
+.thumb.ph { font-size: .8rem; text-align: center; }
+.fund-amounts { display: flex; justify-content: space-between; gap: 8px; font-size: .9rem; margin-top: 6px; }
+.money { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 14px 0 0; }
+.item-card .progress { margin-top: 10px; }

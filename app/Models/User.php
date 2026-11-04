@@ -60,4 +60,14 @@ class User extends Authenticatable
     {
         return $this->isDonor() && $this->verified_count >= 3;
     }
+
+    public function fundRequests(): HasMany
+    {
+        return $this->hasMany(FundRequest::class, 'receiver_id');
+    }
+
+    public function donations(): HasMany
+    {
+        return $this->hasMany(Donation::class, 'donor_id');
+    }
 }

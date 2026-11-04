@@ -38,5 +38,6 @@
 <div class="btn-row" style="margin-top:18px">
     <a class="btn btn-accent" href="{{ route('catalog.index') }}">Cari Barang</a>
     <a class="btn btn-outline" href="{{ route('receiver.requests.index') }}">Pengajuan Saya</a>
+    <a class="btn btn-outline" href="{{ route('receiver.funds.index') }}">Kebutuhan Dana Saya</a>
 </div>
 @endsection

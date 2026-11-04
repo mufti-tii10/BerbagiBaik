@@ -1,6 +1,6 @@
 @csrf
 <div class="info-box" style="margin-top:0">
-    Platform ini hanya untuk <strong>barang layak pakai</strong>. Uang, dana, atau pinjaman tidak diterima dan akan ditolak admin.
+    Form ini khusus <strong>barang layak pakai</strong>. Untuk donasi uang, gunakan menu <a href="{{ route('funds.index') }}">Donasi Dana</a>. Barang yang berisi uang atau pinjaman akan ditolak admin.
 </div>
 @php
     $lat = old('latitude', $item?->latitude);

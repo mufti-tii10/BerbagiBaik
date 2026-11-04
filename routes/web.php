@@ -4,10 +4,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\DonorController;
+use App\Http\Controllers\FundController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiverController;
+use App\Http\Controllers\ReceiverFundController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -16,6 +18,10 @@ Route::get('/', fn () => view('home'))->name('home');
 // Katalog barang (terbuka untuk tamu)
 Route::get('/barang', [CatalogController::class, 'index'])->name('catalog.index');
 Route::get('/barang/{item}', [CatalogController::class, 'show'])->name('catalog.show');
+
+// Katalog donasi dana (terbuka untuk tamu)
+Route::get('/dana', [FundController::class, 'index'])->name('funds.index');
+Route::get('/dana/{fund}', [FundController::class, 'show'])->name('funds.show');
 
 Route::middleware('guest')->group(function () {
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -40,6 +46,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::get('/dana/{fund}/dokumen', [FundController::class, 'document'])->name('funds.document');
 
     // Penerima
     Route::post('/barang/{item}/ajukan', [ReceiverController::class, 'store'])
@@ -49,6 +56,14 @@ Route::middleware('auth')->group(function () {
         Route::get('/dashboard', [ReceiverController::class, 'dashboard'])->name('receiver.dashboard');
         Route::get('/requests', [ReceiverController::class, 'requests'])->name('receiver.requests.index');
         Route::post('/requests/{donationRequest}/cancel', [ReceiverController::class, 'cancel'])->name('receiver.requests.cancel');
+
+        Route::get('/funds', [ReceiverFundController::class, 'index'])->name('receiver.funds.index');
+        Route::get('/funds/create', [ReceiverFundController::class, 'create'])->name('receiver.funds.create');
+        Route::post('/funds', [ReceiverFundController::class, 'store'])->name('receiver.funds.store');
+        Route::get('/funds/{fund}/edit', [ReceiverFundController::class, 'edit'])->name('receiver.funds.edit');
+        Route::put('/funds/{fund}', [ReceiverFundController::class, 'update'])->name('receiver.funds.update');
+        Route::post('/funds/{fund}/close', [ReceiverFundController::class, 'close'])->name('receiver.funds.close');
+        Route::delete('/funds/{fund}', [ReceiverFundController::class, 'destroy'])->name('receiver.funds.destroy');
     });
 
     // Donatur
@@ -70,6 +85,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/items', [AdminController::class, 'items'])->name('items.index');
         Route::post('/items/{item}/approve', [AdminController::class, 'approveItem'])->name('items.approve');
         Route::post('/items/{item}/reject', [AdminController::class, 'rejectItem'])->name('items.reject');
+
+        Route::get('/funds', [AdminController::class, 'funds'])->name('funds.index');
+        Route::post('/funds/{fund}/approve', [AdminController::class, 'approveFund'])->name('funds.approve');
+        Route::post('/funds/{fund}/reject', [AdminController::class, 'rejectFund'])->name('funds.reject');
 
         Route::get('/requests', [AdminController::class, 'requests'])->name('requests.index');
 
