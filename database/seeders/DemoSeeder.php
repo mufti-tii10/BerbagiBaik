@@ -4,7 +4,9 @@ namespace Database\Seeders;
 
 use App\Models\AppNotification;
 use App\Models\Category;
+use App\Models\Donation;
 use App\Models\DonationRequest;
+use App\Models\FundRequest;
 use App\Models\Item;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -43,9 +45,71 @@ class DemoSeeder extends Seeder
             'confirmed_at' => now()->subDay(),
         ]);
 
+        $this->funds($donor, $donor2, $receiver, $receiver2);
+
         $this->notify($donor, 'Ada pengajuan baru untuk "Buku Pelajaran SMP" dari Penerima Demo.');
         $this->notify($donor, 'Barang "Jaket Hoodie Abu-abu" disetujui dan sudah dipublikasikan.');
         $this->notify($receiver2, 'Pengajuan Anda untuk "Mainan Balok Edukasi" disetujui donatur. Silakan atur serah terima barang.');
+    }
+
+    // Data contoh donasi dana: satu tayang dengan donasi, satu tayang, satu menunggu verifikasi admin
+    private function funds(User $donor, User $donor2, User $receiver, User $receiver2): void
+    {
+        $f1 = $this->fund($receiver, 'Biaya Pengobatan Ibu', 'Ibu saya membutuhkan biaya pengobatan rutin dan pembelian obat selama tiga bulan ke depan. Dana akan dipakai untuk obat dan transportasi ke rumah sakit.', 3000000, 30, 'BSI', 'Penerima Demo', '7100000001', 'published', '#2F5597');
+        $this->donation($f1, $donor, 500000, 'confirmed', 'Semoga lekas sembuh.', false);
+        $this->donation($f1, $donor2, 250000, 'confirmed', null, true);
+        $this->donation($f1, $donor, 100000, 'pending', null, false);
+
+        $f2 = $this->fund($receiver2, 'Buku untuk Taman Baca', 'Kami mengelola taman baca kecil untuk anak-anak sekitar dan membutuhkan dana untuk membeli buku bacaan dan rak sederhana.', 1000000, 20, 'Dana', 'Penerima Kedua', '081200000004', 'published', '#548235');
+        $this->donation($f2, $donor, 300000, 'confirmed', 'Untuk adik-adik pembaca.', false);
+
+        $this->fund($receiver2, 'Perbaikan Atap Mushalla Desa', 'Atap mushalla desa bocor dan perlu diperbaiki sebelum musim hujan. Dana digunakan untuk membeli seng dan upah tukang.', 5000000, 45, 'BRI', 'Penerima Kedua', '3300000004', 'pending', '#C55A11');
+    }
+
+    private function fund(User $receiver, string $title, string $desc, int $target, int $days, string $bank, string $accName, string $accNo, string $status, string $color): FundRequest
+    {
+        return FundRequest::firstOrCreate(
+            ['receiver_id' => $receiver->id, 'title' => $title],
+            [
+                'description' => $desc,
+                'target_amount' => $target,
+                'deadline' => now()->addDays($days)->toDateString(),
+                'bank_name' => $bank,
+                'account_name' => $accName,
+                'account_number' => $accNo,
+                'photo_url' => $this->placeholder($title, $color),
+                'proof_doc_url' => $this->privatePlaceholder('Dokumen ' . $title),
+                'status' => $status,
+            ]
+        );
+    }
+
+    private function donation(FundRequest $fund, User $donor, int $amount, string $status, ?string $message, bool $anonymous): Donation
+    {
+        return Donation::firstOrCreate(
+            ['fund_request_id' => $fund->id, 'donor_id' => $donor->id, 'amount' => $amount],
+            [
+                'proof_photo_url' => $this->privatePlaceholder('Bukti transfer ' . $fund->id . '-' . $donor->id . '-' . $amount),
+                'message' => $message,
+                'is_anonymous' => $anonymous,
+                'status' => $status,
+                'confirmed_at' => $status === 'confirmed' ? now()->subDays(2) : null,
+            ]
+        );
+    }
+
+    // Dokumen dan bukti contoh disimpan privat (bukan di folder publik)
+    private function privatePlaceholder(string $label): string
+    {
+        $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">'
+            . '<rect width="640" height="480" fill="#f3f4f6"/>'
+            . '<text x="320" y="250" font-family="Arial, sans-serif" font-size="28" fill="#374151" text-anchor="middle">'
+            . htmlspecialchars($label, ENT_XML1) . '</text></svg>';
+
+        $path = 'fund-docs/demo-' . Str::slug($label) . '.svg';
+        Storage::disk('local')->put($path, $svg);
+
+        return $path;
     }
 
     private function user(string $name, string $email, string $role, string $phone, int $verified = 0): User

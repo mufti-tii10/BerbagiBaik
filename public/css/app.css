@@ -278,3 +278,9 @@ input:focus, select:focus, textarea:focus {
 .fund-amounts { display: flex; justify-content: space-between; gap: 8px; font-size: .9rem; margin-top: 6px; }
 .money { font-size: 1.7rem; font-weight: 800; color: var(--primary); margin: 14px 0 0; }
 .item-card .progress { margin-top: 10px; }
+
+/* Donasi dana bagian B */
+.bank-box { padding: 12px 14px; background: #eff6ff; border-left: 4px solid var(--primary); border-radius: 6px; font-size: .95rem; }
+.bank-num { font-size: 1.15rem; font-weight: 700; letter-spacing: .5px; }
+.reject-box form { width: 100%; }
+.action-box .check { margin-top: 12px; }

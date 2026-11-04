@@ -128,7 +128,7 @@ class AdminController extends Controller
             $status = 'open';
         }
 
-        $reports = Report::with(['reporter', 'item.donor'])
+        $reports = Report::with(['reporter', 'item.donor', 'fund.receiver'])
             ->when($status !== 'all', fn ($q) => $q->where('status', $status))
             ->latest()
             ->limit(100)
@@ -146,6 +146,24 @@ class AdminController extends Controller
 
     public function takedownReport(Report $report)
     {
+        if ($report->fund_request_id) {
+            $fund = $report->fund;
+            abort_unless($fund, 404, 'Kebutuhan dana sudah tidak ada.');
+            abort_if(in_array($fund->status, ['completed', 'closed'], true), 403, 'Kebutuhan ini sudah tidak aktif.');
+
+            $fund->update([
+                'status' => 'rejected',
+                'admin_note' => 'Diturunkan admin berdasarkan laporan: ' . Str::limit($report->reason, 300),
+            ]);
+            $report->update(['status' => 'handled']);
+            AppNotification::create([
+                'user_id' => $fund->receiver_id,
+                'message' => 'Kebutuhan dana "' . $fund->title . '" diturunkan admin berdasarkan laporan pengguna.',
+            ]);
+
+            return back()->with('success', 'Kebutuhan dana diturunkan dan laporan ditandai selesai.');
+        }
+
         $item = $report->item;
         abort_unless($item, 404, 'Barang sudah tidak ada.');
         abort_if($item->status === 'completed', 403, 'Barang yang sudah selesai tidak dapat diturunkan.');

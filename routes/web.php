@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\DonationController;
 use App\Http\Controllers\DonorController;
 use App\Http\Controllers\FundController;
 use App\Http\Controllers\ItemController;
@@ -10,6 +11,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReceiverController;
 use App\Http\Controllers\ReceiverFundController;
+use App\Http\Controllers\ReportController;
 use App\Http\Middleware\RoleMiddleware;
 use Illuminate\Support\Facades\Route;
 
@@ -47,6 +49,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::get('/dana/{fund}/dokumen', [FundController::class, 'document'])->name('funds.document');
+    Route::get('/donasi/{donation}/bukti', [DonationController::class, 'proof'])->name('donations.proof');
+    Route::post('/dana/{fund}/lapor', [ReportController::class, 'storeFund'])->name('funds.report');
+
+    // Donasi uang (donatur)
+    Route::post('/dana/{fund}/donasi', [DonationController::class, 'store'])
+        ->middleware(RoleMiddleware::class . ':donor')->name('donor.donations.store');
 
     // Penerima
     Route::post('/barang/{item}/ajukan', [ReceiverController::class, 'store'])
@@ -64,6 +72,10 @@ Route::middleware('auth')->group(function () {
         Route::put('/funds/{fund}', [ReceiverFundController::class, 'update'])->name('receiver.funds.update');
         Route::post('/funds/{fund}/close', [ReceiverFundController::class, 'close'])->name('receiver.funds.close');
         Route::delete('/funds/{fund}', [ReceiverFundController::class, 'destroy'])->name('receiver.funds.destroy');
+
+        Route::get('/donations', [DonationController::class, 'receiverIndex'])->name('receiver.donations.index');
+        Route::post('/donations/{donation}/confirm', [DonationController::class, 'confirm'])->name('receiver.donations.confirm');
+        Route::post('/donations/{donation}/reject', [DonationController::class, 'reject'])->name('receiver.donations.reject');
     });
 
     // Donatur
@@ -76,6 +88,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/requests/{donationRequest}/reject', [DonorController::class, 'reject'])->name('donor.requests.reject');
 
         Route::get('/history', [DonorController::class, 'history'])->name('donor.history');
+        Route::get('/donations', [DonationController::class, 'donorIndex'])->name('donor.donations.index');
     });
 
     // Admin
@@ -90,6 +103,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/funds/{fund}/approve', [AdminController::class, 'approveFund'])->name('funds.approve');
         Route::post('/funds/{fund}/reject', [AdminController::class, 'rejectFund'])->name('funds.reject');
 
+        Route::get('/donations', [DonationController::class, 'adminIndex'])->name('donations.index');
         Route::get('/requests', [AdminController::class, 'requests'])->name('requests.index');
 
         Route::get('/users', [AdminController::class, 'users'])->name('users.index');

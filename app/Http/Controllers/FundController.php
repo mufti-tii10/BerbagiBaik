@@ -37,7 +37,7 @@ class FundController extends Controller
         $canPreview = $user && ($user->isAdmin() || $user->id === $fund->receiver_id);
 
         // Kebutuhan yang belum disetujui hanya boleh dilihat pemilik dan admin
-        abort_unless($fund->status === 'published' || $canPreview, 404);
+        abort_unless(in_array($fund->status, ['published', 'completed', 'closed'], true) || $canPreview, 404);
 
         $fund->load('receiver');
         $collected = $fund->collectedAmount();
